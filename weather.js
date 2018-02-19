@@ -13,7 +13,7 @@
 // NOTES AND HINTS
 
 // All of the work of grabbing data from the Dark Sky API is already done
-// for you! Your task is to take that data, transform it into HTML, and 
+// for you! Your task is to take that data, transform it into HTML, and
 // insert it into the document. All of your work begins on line 47!
 
 // Each day of the forecast should use HTML markup similar to:
@@ -37,7 +37,7 @@
 // .append() appends a string (containing HTML) to a jQuery DOM object
 
 let handleWeatherResponse = function(response) {
-  // leave these two lines alone; they allow for the inspection of 
+  // leave these two lines alone; they allow for the inspection of
   // the response object in the browser console (try typing "response"
   // in the Chrome JavaScript console!)
   console.log(response)
@@ -56,3 +56,41 @@ $(function() {
     geocodeAndGetWeather(locationName);
   });
 });
+const geocodeAndGetWeather = function(address) {
+  const geocoder = new google.maps.Geocoder();
+  geocoder.geocode( { 'address': address}, function(results, status) {
+    if (status == 'OK') {
+      $("#location").html(results[0].formatted_address);
+      const lat = results[0].geometry.location.lat();
+      const lng = results[0].geometry.location.lng();
+      $.ajax({
+        type: 'GET',
+        url: 'https://api.darksky.net/forecast/52dd0a0afe6b85172771658ff9fb4b3a/' + lat + ',' + lng + '?callback=?',
+        dataType: 'jsonp',
+        contentType: "application/json",
+        success: handleWeatherResponse
+      });
+    }
+  });
+}
+
+// given a Darksky icon name, returns a Font Awesome icon element
+const icon = function(iconName) {
+  switch(iconName) {
+    case "clear-day":
+    case "clear-night":
+      return "<i class='fas fa-sun'></i>";
+      break;
+    case "rain":
+      return "<i class='fas fa-tint'></i>";
+      break;
+    case "wind":
+      return "<i class='fas fa-bars'></i>";
+      break;
+    case "snow":
+    case "sleet":
+      return "<i class='fas fa-snowflake'></i>";
+      break;
+    default:
+      return "<i class='fas fa-cloud'></i>";
+      break;
